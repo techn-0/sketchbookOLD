@@ -1,11 +1,12 @@
 // src/components/Login.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = ({ onLogin }) => {
-  const [showRegister, setShowRegister] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
@@ -20,7 +21,8 @@ const Login = ({ onLogin }) => {
       if (response.ok) {
         const data = await response.json();
         setMessage(data.message);
-        onLogin(); // 로그인 성공 시 콜백 호출
+        onLogin();  // 로그인 성공 시 호출
+        navigate("/sketchbook");  // 로그인 성공 후 스케치북으로 이동
       } else {
         const errorData = await response.json();
         setMessage(errorData.message);
@@ -31,28 +33,8 @@ const Login = ({ onLogin }) => {
     }
   };
 
-  const handleRegister = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessage(data.message);
-        setShowRegister(false); // 회원가입 후 양식 닫기
-      } else {
-        const errorData = await response.json();
-        setMessage(errorData.message);
-      }
-    } catch (error) {
-      console.error("회원가입 오류:", error);
-      setMessage('회원가입 중 오류가 발생했습니다.');
-    }
+  const goToRegister = () => {
+    navigate("/register");  // 회원가입 페이지로 이동
   };
 
   return (
@@ -72,26 +54,9 @@ const Login = ({ onLogin }) => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <button onClick={handleLogin} className="bg-blue-500 text-white p-2 rounded">로그인</button>
-      <button onClick={() => setShowRegister(!showRegister)} className="mt-4 text-blue-500">회원가입</button>
-
-      {showRegister && (
-        <div className="mt-4">
-          <h3 className="text-lg">회원가입</h3>
-          <input
-            type="text"
-            placeholder="아이디"
-            className="border rounded mb-2 p-2"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="비밀번호"
-            className="border rounded mb-4 p-2"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button onClick={handleRegister} className="bg-green-500 text-white p-2 rounded">회원가입</button>
-        </div>
-      )}
+      
+      {/* 회원가입 버튼 */}
+      <button onClick={goToRegister} className="mt-4 text-blue-500">회원가입</button>
     </div>
   );
 };
